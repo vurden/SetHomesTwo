@@ -142,7 +142,7 @@ class MetricsReporterTest extends ServerTestBase {
             String id = MetricsReporter.commandChartId(command);
             assertTrue(id.matches("command_[a-z_]+"), id);
         }
-        assertEquals(14, plugin.getDescription().getCommands().size());
+        assertEquals(15, plugin.getDescription().getCommands().size());
     }
 
     @Test

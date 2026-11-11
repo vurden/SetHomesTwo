@@ -55,24 +55,7 @@ public class HomesDao extends SQLiteDao implements Dao<Home> {
         List<Home> playerHomes = new ArrayList<>();
         try {
             while (rs.next()) {
-                Location homeLocation = new Location(
-                        Bukkit.getWorld(UUID.fromString(rs.getString("world"))),
-                        rs.getDouble("x"),
-                        rs.getDouble("y"),
-                        rs.getDouble("z"),
-                        rs.getFloat("yaw"),
-                        rs.getFloat("pitch")
-                );
-                Home home = new Home(
-                        rs.getString("player_uuid"),
-                        rs.getString("material"),
-                        homeLocation,
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getString("dimension")
-                );
-                home.setId(rs.getInt("id"));
-                home.setPlayerName(rs.getString("player_name"));
+                Home home = readHome(rs);
 
                 World homeWorld = Bukkit.getWorld(UUID.fromString(home.getWorld()));
                 if (ServerUtil.isWorldBlacklisted(homeWorld, blacklistedWorlds)) {
@@ -145,24 +128,7 @@ public class HomesDao extends SQLiteDao implements Dao<Home> {
 
         try {
             while(rs.next()){
-                Location homeLocation = new Location(
-                        Bukkit.getWorld(UUID.fromString(rs.getString("world"))),
-                        rs.getDouble("x"),
-                        rs.getDouble("y"),
-                        rs.getDouble("z"),
-                        rs.getFloat("yaw"),
-                        rs.getFloat("pitch")
-                );
-                home = new Home(
-                        rs.getString("player_uuid"),
-                        rs.getString("material"),
-                        homeLocation,
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getString("dimension")
-                );
-                home.setId(rs.getInt("id"));
-                home.setPlayerName(rs.getString("player_name"));
+                home = readHome(rs);
             }
         } catch (SQLException e) {
             Bukkit.getLogger().severe("There was an issue reading a home for player " + playerUUID);
@@ -255,6 +221,22 @@ public class HomesDao extends SQLiteDao implements Dao<Home> {
         ) > 0;
     }
 
+    public int remapWorld(UUID oldWorld, UUID newWorld) {
+        if (conn == null) return -1;
+
+        String sql = "update %s set world = ? where world = ?";
+        return DatabaseUtil.executeUpdate(conn, String.format(sql, TABLE_NAME), newWorld.toString(), oldWorld.toString());
+    }
+
+    public boolean rename(Home home, String newName) {
+        if (home.getId() == null) return false;
+
+        // An anvil opened before a world remap can still hold the old UUID.
+        String sql = "update %s set name = ? where id = ? and player_uuid = ?";
+        return DatabaseUtil.executeUpdate(conn, String.format(sql, TABLE_NAME),
+                newName, home.getId(), home.getUUIDBelongingTo()) > 0;
+    }
+
     /**
      * Fetch a single home by its primary key, scoped to its owner so one player
      * can never address another player's home by guessing an id.
@@ -271,25 +253,7 @@ public class HomesDao extends SQLiteDao implements Dao<Home> {
 
         try {
             if (rs.next()) {
-                Location homeLocation = new Location(
-                        Bukkit.getWorld(UUID.fromString(rs.getString("world"))),
-                        rs.getDouble("x"),
-                        rs.getDouble("y"),
-                        rs.getDouble("z"),
-                        rs.getFloat("yaw"),
-                        rs.getFloat("pitch")
-                );
-                Home home = new Home(
-                        rs.getString("player_uuid"),
-                        rs.getString("material"),
-                        homeLocation,
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getString("dimension")
-                );
-                home.setId(rs.getInt("id"));
-                home.setPlayerName(rs.getString("player_name"));
-                return home;
+                return readHome(rs);
             }
         } catch (SQLException e) {
             Bukkit.getLogger().severe("There was an issue reading home id " + id);
@@ -297,6 +261,16 @@ public class HomesDao extends SQLiteDao implements Dao<Home> {
         }
 
         return null;
+    }
+
+    private Home readHome(ResultSet rs) throws SQLException {
+        Location coordinates = new Location(null, rs.getDouble("x"), rs.getDouble("y"), rs.getDouble("z"),
+                rs.getFloat("yaw"), rs.getFloat("pitch"));
+        Home home = new Home(rs.getString("player_uuid"), rs.getString("material"), rs.getString("world"),
+                coordinates, rs.getString("name"), rs.getString("description"), rs.getString("dimension"));
+        home.setId(rs.getInt("id"));
+        home.setPlayerName(rs.getString("player_name"));
+        return home;
     }
 
     /**

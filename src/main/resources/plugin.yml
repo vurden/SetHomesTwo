@@ -52,6 +52,9 @@ commands:
   import-homes:
     description: Import homes from another homes plugin (dry-run unless confirmed).
     permission: sh2.import-homes
+  remap-home-world:
+    description: Reconnect homes from an old world UUID to a loaded world. Console only.
+    usage: /<command> <old-world-uuid> <loaded-world-name>
   move-home:
     description: Move one of your homes to where you are standing.
     permission: sh2.move-home

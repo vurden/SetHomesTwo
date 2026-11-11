@@ -47,9 +47,15 @@ public class Home implements Serializable {
     private String playerName;
 
     public Home(String playerUUID, String material, Location location, String name, String description, String dimension) {
+        this(playerUUID, material, Objects.requireNonNull(location.getWorld()).getUID().toString(),
+                location, name, description, dimension);
+    }
+
+    /** Load saved coordinates without requiring the original world to be loaded. */
+    public Home(String playerUUID, String material, String world, Location location, String name, String description, String dimension) {
         setUUIDBelongingTo(playerUUID);
         setMaterial(material);
-        setWorld(Objects.requireNonNull(location.getWorld()).getUID().toString());
+        setWorld(Objects.requireNonNull(world));
         setX(location.getX());
         setY(location.getY());
         setZ(location.getZ());
@@ -202,6 +208,12 @@ public class Home implements Serializable {
             return;
         }
 
+        Location prefetchDestination = this.asLocation();
+        if (prefetchDestination.getWorld() == null) {
+            reportUnavailableWorld(player);
+            return;
+        }
+
         // Home is blacklisted guard
         if(!this.getCanTeleport()) {
             countOutcome(UsageCounters.OUTCOME_BLACKLISTED);
@@ -224,7 +236,6 @@ public class Home implements Serializable {
 
         Plugin plugin = SetHomesTwo.instance();
         boolean teleportSafetyEnabled = ConfigUtil.getConfig().getBoolean("teleportSafety", true);
-        Location prefetchDestination = this.asLocation();
 
         // Warm the destination's chunks now so the safety scan below doesn't
         // block the main thread on chunk I/O once the countdown finishes.
@@ -277,6 +288,15 @@ public class Home implements Serializable {
 
             // Resolve a safe destination before moving the player
             Location destination = this.asLocation();
+            if (destination.getWorld() == null) {
+                if (teleportSafetyEnabled) {
+                    TeleportSafetyUtil.releaseChunkTickets(prefetchDestination, plugin);
+                }
+                reportUnavailableWorld(player);
+                player.resetTitle();
+                player.removePotionEffect(PotionEffectType.NAUSEA);
+                return;
+            }
             if (teleportSafetyEnabled) {
                 Location safeDestination = TeleportSafetyUtil.findSafeLocation(destination);
                 TeleportSafetyUtil.releaseChunkTickets(prefetchDestination, plugin);
@@ -305,6 +325,11 @@ public class Home implements Serializable {
             ChatUtils.sendSuccess(player, String.format(teleportSuccess, this.getName()));
 
         }, 0, 20L);
+    }
+
+    private void reportUnavailableWorld(Player player) {
+        ChatUtils.sendError(player, String.format(ConfigUtil.getConfig().getString(
+                "homeWorldUnavailable", UserError.HOME_WORLD_UNAVAILABLE.getValue()), getName()));
     }
 
     private static void countOutcome(String outcome) {

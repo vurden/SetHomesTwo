@@ -22,6 +22,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.view.AnvilView;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -291,12 +292,12 @@ public class HomeActionsGui implements GuiScreen {
         }
 
         String previousName = home.getName();
-        home.setName(candidate);
 
-        if (!homesDao.update(home)) {
+        if (!homesDao.rename(home, candidate)) {
             ChatUtils.pluginError(player);
             return RenameOutcome.UPDATE_FAILED;
         }
+        home.setName(candidate);
 
         String renamed = ConfigUtil.getConfig().getString("homeRenamed", UserSuccess.HOME_RENAMED.getValue());
         ChatUtils.sendSuccess(player, String.format(renamed, previousName, candidate));
@@ -347,7 +348,9 @@ public class HomeActionsGui implements GuiScreen {
                     // Captured before the call, because a successful rename
                     // mutates the home's name in place.
                     String currentName = home.getName();
-                    RenameOutcome outcome = applyRename(player, home, stateSnapshot.getText(), maxLength);
+                    // AnvilGUI's output item can retain the old name on 1.21.11.
+                    String enteredName = ((AnvilView) player.getOpenInventory()).getRenameText();
+                    RenameOutcome outcome = applyRename(player, home, enteredName, maxLength);
 
                     switch (outcome) {
                         case EMPTY:

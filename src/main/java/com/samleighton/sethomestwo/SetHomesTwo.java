@@ -264,6 +264,8 @@ public class SetHomesTwo extends JavaPlugin {
         importHomes.setExecutor(new ImportHomes());
         importHomes.setTabCompleter(new ImportSourcesTabCompleter());
 
+        Objects.requireNonNull(getCommand("remap-home-world")).setExecutor(new RemapHomeWorld());
+
         PluginCommand moveHome = Objects.requireNonNull(this.getCommand("move-home"));
         moveHome.setExecutor(new MoveHome());
         moveHome.setTabCompleter(new HomesTabCompleter());

@@ -102,6 +102,7 @@ homeDoesNotExist: "The home '%s' does not exist."
 # Shown when a player name matches nobody online and nobody with saved homes.
 playerNotFound: "No player by that name is online or has any saved homes."
 unsafeHome: "Teleport canceled: this home is not safe to stand in and no safe spot was found nearby."
+homeWorldUnavailable: "Cannot teleport to '%s': its world is not loaded. Your home has been kept."
 movedToSafeSpot: "Your home was not safe to stand in, so you were moved to the nearest safe spot."
 
 # -- DEBUGGING --

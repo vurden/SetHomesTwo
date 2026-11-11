@@ -386,6 +386,18 @@ In a SQLite database in `plugins/SetHomesTwo/`. Nothing external to install and 
 
 Found a bug or want a feature? Open an issue on [GitHub](https://github.com/Blockframe-Studios/SetHomesTwo/issues). It gets seen faster than a comment on this page.
 
+### Local Spigot 1.21.11 test server
+
+With Java 21 and Maven installed, run this from the repository:
+
+```sh
+bash scripts/run-test-server.sh
+```
+
+The launcher asks you to accept the Minecraft EULA, builds Spigot 1.21.11 with official BuildTools if needed, builds and tests the plugin, and installs it into a separate server under `run/spigot-1.21.11/`. The first server build takes several minutes; later launches reuse it. Existing test worlds, homes and settings are preserved. Debug logging is enabled, and bStats and update checks are disabled for this test server.
+
+Join with Minecraft Java **1.21.11** at **`localhost:25585`**. Try `/sethome base`, `/home base`, and `/homes`; right-click a home and choose Rename to test the anvil prompt. Type `stop` in the server console when finished. If something fails, the log to share is `run/spigot-1.21.11/logs/latest.log`.
+
 [Source](https://github.com/Blockframe-Studios/SetHomesTwo) | [Report a bug](https://github.com/Blockframe-Studios/SetHomesTwo/issues) | [Donate](https://www.paypal.com/donate/?business=8LXCRFX27B37C&no_recurring=0&item_name=Thanks+for+your+support.+It+helps+keep+this+plugin+up+to+date+%3A%29&currency_code=USD) | [Discord](https://discord.gg/casu9hYrF)
 
 ## Changelog

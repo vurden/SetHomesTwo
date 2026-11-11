@@ -20,7 +20,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 public class ListHomes implements CommandExecutor {
@@ -78,7 +77,8 @@ public class ListHomes implements CommandExecutor {
             name.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/home " + home.getName()));
             name.setUnderlined(true);
 
-            TextComponent world = new TextComponent(Objects.requireNonNull(bukkitWorld).getName());
+            TextComponent world = new TextComponent(bukkitWorld == null
+                    ? "Unavailable (" + home.getWorld() + ")" : bukkitWorld.getName());
 
             // Add home name to main message
             mainMessage.addExtra(homeName);

@@ -29,6 +29,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HomeActionsGuiTest extends ServerTestBase {
 
+    @Test
+    void renamingAnAlreadyOpenHomeDoesNotUndoAWorldRemap() {
+        PlayerMock player = addPlayer();
+        Home home = HomeFixtures.persist(player, "base");
+        HomeActionsGui gui = new HomeActionsGui(player, home);
+        assertTrue(server.executeConsole("remap-home-world", home.getWorld(), nether.getName()).hasSucceeded());
+
+        assertEquals(HomeActionsGui.RenameOutcome.RENAMED, gui.applyRename(player, home, "newbase", 32));
+        Home renamed = new HomesDao().get(player.getUniqueId(), "newbase");
+        assertNotNull(renamed);
+        assertEquals(nether.getUID().toString(), renamed.getWorld());
+    }
+
     private static final int SLOT_RENAME = 0;
     private static final int SLOT_MOVE = 1;
     private static final int SLOT_ICON = 2;

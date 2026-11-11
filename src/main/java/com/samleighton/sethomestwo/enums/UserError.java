@@ -15,6 +15,7 @@ public enum UserError {
     MOVED_WHILE_TELEPORTING("Your teleport has been canceled because you have moved."),
     ALREADY_TELEPORTING("You cannot teleport while already teleporting."),
     UNSAFE_HOME("Teleport canceled: this home is not safe to stand in and no safe spot was found nearby."),
+    HOME_WORLD_UNAVAILABLE("Cannot teleport to '%s': its world is not loaded. Your home has been kept."),
 
     /** Command Input Errors */
     DIMENSION_IS_NOT_BLACKLISTED("The %s dimension has not been blacklisted yet therefore you cannot remove it."),
