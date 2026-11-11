@@ -304,7 +304,7 @@ class HomeActionsGuiTest extends ServerTestBase {
         GuiSession session = new GuiSession(new HomesGui(player));
 
         HomeActionsGui gui = openSubmenu(player, home, session);
-        click(gui, session, player, 3);
+        click(gui, session, player, 5);
 
         assertTrue(plugin.getUsageCounters().snapshot(UsageCounters.Family.GUI_ACTION).isEmpty());
     }

@@ -40,16 +40,19 @@ public class HomeActionsGui implements GuiScreen {
     public static final String ACTION_RENAME = "rename";
     public static final String ACTION_MOVE = "move";
     public static final String ACTION_ICON = "icon";
+    public static final String ACTION_LINK_SIGN = "link-sign";
     public static final String ACTION_DELETE = "delete";
     public static final String ACTION_CONFIRM_DELETE = "confirm-delete";
     public static final String ACTION_CANCEL_DELETE = "cancel-delete";
     public static final String ACTION_BACK = "back";
 
-    private static final Set<String> KNOWN_ACTIONS = Set.of(ACTION_RENAME, ACTION_MOVE, ACTION_ICON, ACTION_DELETE, ACTION_CONFIRM_DELETE, ACTION_CANCEL_DELETE, ACTION_BACK);
+    private static final Set<String> KNOWN_ACTIONS = Set.of(ACTION_RENAME, ACTION_MOVE, ACTION_ICON, ACTION_LINK_SIGN,
+            ACTION_DELETE, ACTION_CONFIRM_DELETE, ACTION_CANCEL_DELETE, ACTION_BACK);
 
     private static final int SLOT_RENAME = 0;
     private static final int SLOT_MOVE = 1;
     private static final int SLOT_ICON = 2;
+    private static final int SLOT_LINK_SIGN = 3;
     private static final int SLOT_DELETE = 4;
     private static final int SLOT_BACK = 8;
 
@@ -141,6 +144,7 @@ public class HomeActionsGui implements GuiScreen {
         inv.setItem(SLOT_RENAME, button("renameButtonItem", Material.NAME_TAG, "renameButtonName", "Rename", ACTION_RENAME));
         inv.setItem(SLOT_MOVE, button("moveHomeButtonItem", Material.ENDER_PEARL, "moveHomeButtonName", "Move home here", ACTION_MOVE));
         inv.setItem(SLOT_ICON, button("setIconButtonItem", Material.ITEM_FRAME, "setIconButtonName", "Set icon to held item", ACTION_ICON));
+        inv.setItem(SLOT_LINK_SIGN, button("linkSignButtonItem", Material.OAK_SIGN, "linkSignButtonName", "Link to Sign", ACTION_LINK_SIGN));
         inv.setItem(SLOT_DELETE, button("deleteButtonItem", Material.BARRIER, "deleteButtonName", "&cDelete", ACTION_DELETE));
         inv.setItem(SLOT_BACK, button("backButtonItem", Material.ARROW, "backButtonName", "Back", ACTION_BACK));
 
@@ -173,6 +177,32 @@ public class HomeActionsGui implements GuiScreen {
 
         if (ACTION_BACK.equals(action)) {
             session.openHomeList(player);
+            return;
+        }
+
+        if (ACTION_LINK_SIGN.equals(action)) {
+            if (!player.hasPermission("sh2.manage-homes")) {
+                ChatUtils.invalidPermissions(player);
+                return;
+            }
+            Home home = reloadHome(player, session);
+            if (home == null) return;
+
+            String link = new HomesDao().getOrCreateSignLink(player.getUniqueId(), home.getId());
+            if (link == null) {
+                ChatUtils.pluginError(player);
+                return;
+            }
+
+            Bukkit.getScheduler().runTask(SetHomesTwo.instance(), () -> {
+                if (!player.isOnline() || session.getActiveScreen() != this
+                        || !player.getOpenInventory().getTopInventory().equals(inv)) return;
+
+                player.closeInventory();
+                session.startSignLink(link);
+                ChatUtils.sendInfo(player, "Right-click a sign to link it to " + home.getName()
+                        + ". Right-click anything else to cancel.");
+            });
             return;
         }
 

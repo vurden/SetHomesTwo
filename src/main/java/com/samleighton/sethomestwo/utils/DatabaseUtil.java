@@ -31,6 +31,9 @@ public class DatabaseUtil {
         boolean createPlayersHomes = execute(connection, String.format(createPlayersHomesSQL, "players_homes"));
 
         boolean playerNameColumn = ensureColumn(connection, "players_homes", "player_name", "TEXT");
+        boolean signLinkColumn = ensureColumn(connection, "players_homes", "sign_link", "TEXT");
+        boolean signLinkIndex = signLinkColumn && execute(connection,
+                "create unique index if not exists players_homes_sign_link on players_homes(sign_link);");
 
         // Create blacklist table
         String createBlacklistSQL = "create table if not exists %s (\n" +
@@ -50,7 +53,7 @@ public class DatabaseUtil {
                 ");";
         boolean createPlayerTeleportAttempts = execute(connection, String.format(createSQL, "player_teleport_attempts"));
 
-        return createPlayerTeleportAttempts && createBlacklist && createPlayersHomes && playerNameColumn;
+        return createPlayerTeleportAttempts && createBlacklist && createPlayersHomes && playerNameColumn && signLinkIndex;
     }
 
     /**

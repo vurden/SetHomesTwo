@@ -263,6 +263,40 @@ public class HomesDao extends SQLiteDao implements Dao<Home> {
         return null;
     }
 
+    public String getOrCreateSignLink(UUID owner, int homeId) {
+        if (conn == null) return null;
+
+        // SQLite can reuse a deleted row ID, so signs need their own permanent ID.
+        String sql = "update players_homes set sign_link = coalesce(sign_link, ?)"
+                + " where id = ? and player_uuid = ? returning sign_link";
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setString(1, UUID.randomUUID().toString());
+            statement.setInt(2, homeId);
+            statement.setString(3, owner.toString());
+            try (ResultSet rs = statement.executeQuery()) {
+                return rs.next() ? rs.getString("sign_link") : null;
+            }
+        } catch (SQLException e) {
+            Bukkit.getLogger().warning("Could not create home sign link: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public Home getBySignLink(String link) {
+        if (conn == null) return null;
+
+        String sql = "select * from players_homes where sign_link = ?";
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setString(1, link);
+            try (ResultSet rs = statement.executeQuery()) {
+                return rs.next() ? readHome(rs) : null;
+            }
+        } catch (SQLException e) {
+            Bukkit.getLogger().warning("Could not read home sign link: " + e.getMessage());
+            return null;
+        }
+    }
+
     private Home readHome(ResultSet rs) throws SQLException {
         Location coordinates = new Location(null, rs.getDouble("x"), rs.getDouble("y"), rs.getDouble("z"),
                 rs.getFloat("yaw"), rs.getFloat("pitch"));

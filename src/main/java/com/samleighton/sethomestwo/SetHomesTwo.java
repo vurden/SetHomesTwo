@@ -7,6 +7,7 @@ import com.samleighton.sethomestwo.enums.DebugLevel;
 import com.samleighton.sethomestwo.metrics.CommandUsageListener;
 import com.samleighton.sethomestwo.metrics.MetricsReporter;
 import com.samleighton.sethomestwo.metrics.UsageCounters;
+import com.samleighton.sethomestwo.events.HomeSigns;
 import com.samleighton.sethomestwo.events.PlayerJoin;
 import com.samleighton.sethomestwo.events.PlayerLeave;
 import com.samleighton.sethomestwo.events.PlayerMoveWhileTeleporting;
@@ -289,7 +290,9 @@ public class SetHomesTwo extends JavaPlugin {
     public void registerEventListeners() {
         getServer().getPluginManager().registerEvents(new PlayerJoin(this, updateChecker), this);
         getServer().getPluginManager().registerEvents(new PlayerLeave(this), this);
-        getServer().getPluginManager().registerEvents(new RightClickHomeItem(this), this);
+        HomeSigns homeSigns = new HomeSigns(this);
+        getServer().getPluginManager().registerEvents(homeSigns, this);
+        getServer().getPluginManager().registerEvents(new RightClickHomeItem(this, homeSigns), this);
         getServer().getPluginManager().registerEvents(new PlayerMoveWhileTeleporting(), this);
         getServer().getPluginManager().registerEvents(new CommandUsageListener(this), this);
     }

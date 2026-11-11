@@ -95,7 +95,7 @@ permissions:
     description: Allow player to get the homes viewing item.
     default: false
   sh2.manage-homes:
-    description: Allow player to rename, move, re-icon, and delete their homes from the GUI.
+    description: Allow players to rename, move, change icons, link signs, and delete their homes from the GUI.
     default: false
   sh2.move-home:
     description: Allow a player to move their own homes by command.

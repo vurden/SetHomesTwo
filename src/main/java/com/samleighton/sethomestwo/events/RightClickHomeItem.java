@@ -16,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -30,13 +31,17 @@ import java.util.Objects;
 public class RightClickHomeItem implements Listener {
 
     private final SetHomesTwo plugin;
+    private final HomeSigns homeSigns;
 
-    public RightClickHomeItem(SetHomesTwo plugin) {
+    public RightClickHomeItem(SetHomesTwo plugin, HomeSigns homeSigns) {
         this.plugin = plugin;
+        this.homeSigns = homeSigns;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerRightClickHomeItem(PlayerInteractEvent event) {
+        if (homeSigns.handleRightClick(event)) return;
+
         Player player = event.getPlayer();
         Action action = event.getAction();
         Material homeMaterial = Material.matchMaterial(ConfigUtil.getConfig().getString("openHomeItem", Material.COMPASS.name()));

@@ -11,8 +11,11 @@ import org.bukkit.event.inventory.InventoryDragEvent;
  */
 public class GuiSession {
 
+    public record SignLinkAttempt(String homeLink) {}
+
     private final HomesGui homesGui;
     private GuiScreen activeScreen;
+    private SignLinkAttempt signLinkAttempt;
 
     public GuiSession(HomesGui homesGui) {
         this.homesGui = homesGui;
@@ -28,6 +31,19 @@ public class GuiSession {
 
     public void setActiveScreen(GuiScreen activeScreen) {
         this.activeScreen = activeScreen;
+        signLinkAttempt = null;
+    }
+
+    public void startSignLink(String homeLink) {
+        signLinkAttempt = new SignLinkAttempt(homeLink);
+    }
+
+    public SignLinkAttempt getSignLinkAttempt() {
+        return signLinkAttempt;
+    }
+
+    public void clearSignLink() {
+        signLinkAttempt = null;
     }
 
     /**

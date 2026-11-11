@@ -86,11 +86,14 @@ Open your homes with `/homes`, or right-click the homes item. Then:
 | Rename | Opens an anvil prompt for the new name |
 | Move home here | Repoints the home at where you are standing |
 | Set icon to held item | The home's icon becomes whatever you are holding |
+| Link to Sign | Prompts you to right-click an existing sign you can edit |
 | Delete | Asks for confirmation first |
 
 ![Right-clicking a home to rename it](docs/img/rename.gif)
 
 The management menu is controlled by `sh2.manage-homes`, which defaults to granted.
+
+After choosing **Link to Sign**, right-click an editable sign to share that home. Right-click another block or an entity to cancel. Players with `sh2.teleport` can use the linked sign, subject to their usual teleport restrictions. A linked sign follows the home when it moves or is renamed. Deleting the home makes the sign inactive. The sign keeps its existing text and still loads as a regular sign when SetHomesTwo is removed.
 
 Changing a home's icon works the same way. Hold the item you want and click **Set icon to held item**:
 
@@ -128,7 +131,7 @@ Two bundles group the nodes, so you can move a whole role in one line:
 | `sh2.list-homes` | everyone | Listing homes in chat, and `/homes` |
 | `sh2.delete-home` | everyone | Deleting your own homes |
 | `sh2.give-homes-item` | everyone | Getting the menu item |
-| `sh2.manage-homes` | everyone | Renaming, moving, re-iconing and deleting from the GUI |
+| `sh2.manage-homes` | everyone | Renaming, moving, changing icons, linking signs, and deleting from the GUI |
 | `sh2.move-home` | everyone | Moving your own home with `/uhome` |
 | `sh2.set-max-homes` | OP | Setting home limits |
 | `sh2.get-player-homes` | OP | Viewing another player's homes |
